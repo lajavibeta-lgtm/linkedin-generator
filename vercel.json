@@ -1,8 +1,4 @@
 {
   "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "env": {
-    "GROQ_API_KEY": "@groq_api_key",
-    "HF_TOKEN": "@hf_token"
-  }
+  "installCommand": "npm install"
 }
