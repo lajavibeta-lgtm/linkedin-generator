@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 LinkedIn Content Generator</title>
+    <title>LinkedIn Content Coach</title>
     <style>
         * {
             margin: 0;
@@ -13,131 +13,182 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0a66c2 0%, #004182 100%);
             min-height: 100vh;
             padding: 2rem;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
         }
 
         .container {
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 800px;
+            max-width: 820px;
             width: 100%;
             padding: 3rem;
             overflow: hidden;
+            margin: auto;
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0a66c2 0%, #004182 100%);
             color: white;
             padding: 2rem;
             margin: -3rem -3rem 2rem -3rem;
             text-align: center;
-            border-bottom: 5px solid #667eea;
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 700;
             margin: 0;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            letter-spacing: -0.5px;
         }
 
         .header p {
-            font-size: 1rem;
-            margin-top: 0.5rem;
-            opacity: 0.95;
+            font-size: 0.95rem;
+            margin-top: 0.4rem;
+            opacity: 0.85;
             font-weight: 300;
         }
 
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            padding: 0.2rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 0.6rem;
+        }
+
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.4rem;
         }
 
         label {
             display: block;
             font-weight: 600;
             color: #333;
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
         }
 
         input[type="text"],
+        textarea,
         select {
             width: 100%;
             padding: 0.75rem 1rem;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-family: inherit;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             background-color: #f9f9f9;
         }
 
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+        }
+
         input[type="text"]:focus,
+        textarea:focus,
         select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #0a66c2;
             background-color: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.1);
+        }
+
+        .hint {
+            font-size: 0.78rem;
+            color: #888;
+            margin-top: 0.3rem;
+        }
+
+        .voice-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            color: #0a66c2;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.4rem;
+            user-select: none;
+        }
+
+        .voice-toggle:hover {
+            text-decoration: underline;
+        }
+
+        .voice-section {
+            display: none;
+            margin-bottom: 1.4rem;
+        }
+
+        .voice-section.open {
+            display: block;
         }
 
         .checkbox-group {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            margin-top: 0.5rem;
+            margin-top: 0.3rem;
         }
 
         input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
-            accent-color: #667eea;
+            accent-color: #0a66c2;
         }
 
         .checkbox-group label {
             margin: 0;
             font-weight: 500;
             cursor: pointer;
+            font-size: 0.9rem;
         }
 
         .button-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
-            margin-top: 2rem;
+            margin-top: 1.8rem;
         }
 
         button {
-            padding: 0.9rem 1.5rem;
-            font-size: 1rem;
+            padding: 0.85rem 1.5rem;
+            font-size: 0.95rem;
             font-weight: 600;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             font-family: inherit;
         }
 
         .btn-submit {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0a66c2 0%, #004182 100%);
             color: white;
             grid-column: 1 / 2;
         }
 
         .btn-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 20px rgba(10, 102, 194, 0.35);
         }
 
-        .btn-submit:active {
-            transform: translateY(0);
-        }
+        .btn-submit:active { transform: translateY(0); }
 
         .btn-reset {
             background: #f0f0f0;
@@ -150,10 +201,6 @@
             transform: translateY(-2px);
         }
 
-        .btn-reset:active {
-            transform: translateY(0);
-        }
-
         .loading {
             display: none;
             text-align: center;
@@ -161,28 +208,24 @@
             margin-top: 2rem;
         }
 
-        .loading.active {
-            display: block;
-        }
+        .loading.active { display: block; }
 
         .spinner {
-            width: 50px;
-            height: 50px;
+            width: 46px;
+            height: 46px;
             margin: 0 auto 1rem;
             border: 4px solid #f0f0f0;
-            border-top: 4px solid #667eea;
+            border-top: 4px solid #0a66c2;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.9s linear infinite;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .loading-text {
-            color: #667eea;
+            color: #0a66c2;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .error {
@@ -196,9 +239,7 @@
             font-weight: 500;
         }
 
-        .error.active {
-            display: block;
-        }
+        .error.active { display: block; }
 
         .error-close {
             float: right;
@@ -210,48 +251,76 @@
         .output {
             display: none;
             margin-top: 2rem;
-            padding: 2rem;
-            background: #f9f9f9;
-            border-radius: 12px;
-            border-left: 4px solid #667eea;
         }
 
         .output.active {
             display: block;
-            animation: slideIn 0.4s ease;
+            animation: slideIn 0.35s ease;
         }
 
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .output-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #667eea;
+        .output-section {
+            border-radius: 10px;
+            overflow: hidden;
             margin-bottom: 1rem;
+        }
+
+        .output-section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .post-header {
+            background: #0a66c2;
+            color: white;
+        }
+
+        .coach-header {
+            background: #f0f5ff;
+            color: #0a66c2;
+            border: 2px solid #d0e4ff;
+            border-bottom: none;
         }
 
         .output-content {
             background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            line-height: 1.65;
+            color: #1a1a1a;
+            white-space: pre-wrap;
+            border: 2px solid #e8e8e8;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            max-height: 380px;
+            overflow-y: auto;
+            font-size: 0.95rem;
+        }
+
+        .coach-note {
+            background: #f7faff;
+            padding: 1rem 1.5rem;
             line-height: 1.6;
             color: #333;
-            margin-bottom: 1.5rem;
-            max-height: 400px;
-            overflow-y: auto;
+            white-space: pre-wrap;
+            border: 2px solid #d0e4ff;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            font-size: 0.88rem;
+            font-style: italic;
         }
 
         .output-image {
-            margin: 1.5rem 0;
+            margin: 1rem 0;
             border-radius: 12px;
             max-width: 100%;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -259,120 +328,113 @@
         }
 
         .image-loading {
-            margin: 1.5rem 0;
-            padding: 2rem;
+            margin: 1rem 0;
+            padding: 1.5rem;
             background: #f0f0f0;
-            border-radius: 12px;
+            border-radius: 10px;
             text-align: center;
-            color: #667eea;
+            color: #0a66c2;
             font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .image-error {
-            margin: 1.5rem 0;
-            padding: 1rem;
+            margin: 1rem 0;
+            padding: 0.85rem 1rem;
             background: #fff3cd;
             border: 1px solid #ffc107;
             border-radius: 8px;
             color: #856404;
-            font-size: 0.9rem;
-        }
-
-        .button-group-output {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
+            font-size: 0.85rem;
         }
 
         .btn-copy {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 100%;
+            background: linear-gradient(135deg, #0a66c2 0%, #004182 100%);
             color: white;
-            padding: 0.9rem 1.5rem;
+            padding: 0.85rem 1.5rem;
+            margin-top: 0.5rem;
         }
 
         .btn-copy:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 20px rgba(10, 102, 194, 0.35);
         }
 
-        .btn-copy.copied {
-            background: #4caf50;
-        }
+        .btn-copy.copied { background: #4caf50; }
 
         @media (max-width: 600px) {
-            .container {
-                padding: 1.5rem;
-            }
-
-            .header {
-                padding: 1.5rem;
-                margin: -1.5rem -1.5rem 1.5rem -1.5rem;
-            }
-
-            .header h1 {
-                font-size: 1.8rem;
-            }
-
-            .button-group {
-                grid-template-columns: 1fr;
-            }
-
-            .btn-submit,
-            .btn-reset {
-                grid-column: 1 / 2;
-            }
-
-            .output-content {
-                max-height: 300px;
-            }
+            .container { padding: 1.5rem; }
+            .header { padding: 1.5rem; margin: -1.5rem -1.5rem 1.5rem -1.5rem; }
+            .header h1 { font-size: 1.5rem; }
+            .button-group { grid-template-columns: 1fr; }
+            .btn-submit, .btn-reset { grid-column: 1 / 2; }
+            .output-content { max-height: 280px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 LinkedIn Content Generator</h1>
-            <p>Crea contenido profesional optimizado para LinkedIn en segundos</p>
+            <div class="badge">Powered by Groq · llama-3.3-70b</div>
+            <h1>LinkedIn Content Coach</h1>
+            <p>Contenido auténtico para publicidad digital, martech e IA</p>
         </div>
 
         <form id="contentForm">
             <div class="form-group">
-                <label for="topic">📌 Tema a desarrollar</label>
-                <input
-                    type="text"
-                    id="topic"
-                    name="topic"
-                    placeholder="Ej: Marketing digital, Productividad, Liderazgo..."
-                    required
-                >
+                <label for="contentType">Modo de contenido</label>
+                <select id="contentType" name="contentType" required>
+                    <option value="">Selecciona un modo...</option>
+                    <option value="post">Post (breve, impacto inmediato)</option>
+                    <option value="articulo">Artículo (largo, profundidad)</option>
+                    <option value="hook">Hooks (3 opciones de apertura)</option>
+                    <option value="revisar">Revisar texto existente</option>
+                </select>
             </div>
 
             <div class="form-group">
-                <label for="contentType">📄 Tipo de contenido</label>
-                <select id="contentType" name="contentType" required>
-                    <option value="">Selecciona un tipo...</option>
-                    <option value="post">📱 Post (breve)</option>
-                    <option value="article">📄 Artículo (largo)</option>
-                </select>
+                <label for="topic" id="topicLabel">Tema o idea</label>
+                <textarea
+                    id="topic"
+                    name="topic"
+                    placeholder="Ej: Las agencias que no adopten IA van a desaparecer..."
+                    rows="3"
+                    required
+                ></textarea>
+                <div class="hint" id="topicHint">Cuanto más específico seas, mejor el resultado.</div>
+            </div>
+
+            <div class="voice-toggle" id="voiceToggle" onclick="toggleVoice()">
+                <span id="voiceArrow">▶</span> Agregar muestra de tu voz (opcional)
+            </div>
+            <div class="voice-section" id="voiceSection">
+                <label for="voiceSample">Posts anteriores tuyos (1–2 ejemplos)</label>
+                <textarea
+                    id="voiceSample"
+                    name="voiceSample"
+                    placeholder="Pega aquí posts de LinkedIn que hayas escrito. El coach los usará para calibrar tu tono y estilo antes de escribir."
+                    rows="5"
+                ></textarea>
+                <div class="hint">Cuanto más auténtica la muestra, más fiel será el resultado al "Espejo de Identidad".</div>
             </div>
 
             <div class="form-group">
                 <div class="checkbox-group">
                     <input type="checkbox" id="generateImage" name="generateImage">
-                    <label for="generateImage">🖼️ Generar imagen para el contenido</label>
+                    <label for="generateImage">Generar imagen para el post</label>
                 </div>
             </div>
 
             <div class="button-group">
-                <button type="submit" class="btn-submit">✨ Generar Contenido</button>
-                <button type="reset" class="btn-reset">🗑️ Limpiar</button>
+                <button type="submit" class="btn-submit">Generar contenido</button>
+                <button type="reset" class="btn-reset" onclick="resetForm()">Limpiar</button>
             </div>
         </form>
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <div class="loading-text">Generando tu contenido...</div>
+            <div class="loading-text" id="loadingText">Generando contenido...</div>
         </div>
 
         <div class="error" id="error">
@@ -381,20 +443,32 @@
         </div>
 
         <div class="output" id="output">
-            <div class="output-title">✅ Tu contenido está listo</div>
-            <div class="output-content" id="outputContent"></div>
-            <div id="imageLoading" class="image-loading" style="display: none;">🖼️ Cargando imagen...</div>
+            <div class="output-section">
+                <div class="output-section-header post-header">
+                    📌 Contenido listo
+                </div>
+                <div class="output-content" id="outputContent"></div>
+            </div>
+
+            <div class="output-section" id="coachSection" style="display:none">
+                <div class="output-section-header coach-header">
+                    🔍 Nota del coach
+                </div>
+                <div class="coach-note" id="coachNote"></div>
+            </div>
+
+            <div id="imageLoading" class="image-loading" style="display: none;">Cargando imagen...</div>
             <div id="imageError" class="image-error" style="display: none;">No se pudo cargar la imagen. El contenido está disponible arriba.</div>
             <img id="outputImage" class="output-image" style="display: none;" alt="Imagen generada">
-            <div class="button-group-output">
-                <button type="button" class="btn-copy" id="copyBtn" onclick="copyToClipboard()">📋 Copiar al portapapeles</button>
-            </div>
+
+            <button type="button" class="btn-copy" id="copyBtn" onclick="copyToClipboard()">Copiar contenido</button>
         </div>
     </div>
 
     <script>
         const form = document.getElementById('contentForm');
         const loading = document.getElementById('loading');
+        const loadingText = document.getElementById('loadingText');
         const error = document.getElementById('error');
         const errorMessage = document.getElementById('errorMessage');
         const output = document.getElementById('output');
@@ -402,37 +476,97 @@
         const outputImage = document.getElementById('outputImage');
         const imageLoading = document.getElementById('imageLoading');
         const imageError = document.getElementById('imageError');
+        const coachSection = document.getElementById('coachSection');
+        const coachNote = document.getElementById('coachNote');
         const copyBtn = document.getElementById('copyBtn');
+        const topicLabel = document.getElementById('topicLabel');
+        const topicHint = document.getElementById('topicHint');
+        const topicField = document.getElementById('topic');
 
         let currentContent = '';
+
+        const modeConfig = {
+            post: {
+                label: 'Tema o idea',
+                placeholder: 'Ej: Las agencias que no adopten IA van a desaparecer...',
+                hint: 'Cuanto más específico seas, mejor el resultado.',
+                loading: 'Redactando tu post...'
+            },
+            articulo: {
+                label: 'Tema del artículo',
+                placeholder: 'Ej: Cómo el cookieless world está cambiando el modelo de atribución en LATAM',
+                hint: 'Para artículos, añade contexto o ángulo específico si lo tienes.',
+                loading: 'Redactando tu artículo...'
+            },
+            hook: {
+                label: 'Tema para los hooks',
+                placeholder: 'Ej: El gap entre lo que los CMOs piden y lo que los medios pueden medir',
+                hint: 'Recibirás 3 opciones de hook con sus respectivos fundamentos.',
+                loading: 'Generando 3 opciones de hook...'
+            },
+            revisar: {
+                label: 'Texto a revisar',
+                placeholder: 'Pega aquí tu borrador de post o artículo de LinkedIn...',
+                hint: 'El coach mejorará el texto manteniendo tu voz y aplicando las reglas de estilo.',
+                loading: 'Revisando tu texto...'
+            }
+        };
+
+        document.getElementById('contentType').addEventListener('change', function () {
+            const cfg = modeConfig[this.value];
+            if (!cfg) return;
+            topicLabel.textContent = cfg.label;
+            topicField.placeholder = cfg.placeholder;
+            topicHint.textContent = cfg.hint;
+        });
+
+        function toggleVoice() {
+            const section = document.getElementById('voiceSection');
+            const arrow = document.getElementById('voiceArrow');
+            const isOpen = section.classList.toggle('open');
+            arrow.textContent = isOpen ? '▼' : '▶';
+        }
+
+        function resetForm() {
+            output.classList.remove('active');
+            closeError();
+            topicLabel.textContent = 'Tema o idea';
+            topicField.placeholder = 'Ej: Las agencias que no adopten IA van a desaparecer...';
+            topicHint.textContent = 'Cuanto más específico seas, mejor el resultado.';
+            document.getElementById('voiceSection').classList.remove('open');
+            document.getElementById('voiceArrow').textContent = '▶';
+        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const topic = document.getElementById('topic').value.trim();
+            const topic = topicField.value.trim();
             const contentType = document.getElementById('contentType').value;
             const generateImage = document.getElementById('generateImage').checked;
+            const voiceSample = document.getElementById('voiceSample').value.trim();
 
             if (!topic || !contentType) {
                 showError('Por favor completa todos los campos requeridos.');
                 return;
             }
 
+            const cfg = modeConfig[contentType] || modeConfig.post;
+
             try {
                 closeError();
+                loadingText.textContent = cfg.loading;
                 loading.classList.add('active');
                 output.classList.remove('active');
 
                 const apiUrl = `${window.location.origin}/api/generate`;
                 const response = await fetch(apiUrl, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        topic: topic,
+                        topic,
                         context: contentType,
-                        include_image: generateImage
+                        include_image: generateImage,
+                        voice_sample: voiceSample || null
                     })
                 });
 
@@ -445,6 +579,13 @@
 
                 currentContent = data.content;
                 outputContent.textContent = data.content;
+
+                if (data.coach_note) {
+                    coachNote.textContent = data.coach_note;
+                    coachSection.style.display = 'block';
+                } else {
+                    coachSection.style.display = 'none';
+                }
 
                 imageLoading.style.display = 'none';
                 imageError.style.display = 'none';
@@ -464,7 +605,7 @@
                 }
 
                 output.classList.add('active');
-                copyBtn.textContent = '📋 Copiar al portapapeles';
+                copyBtn.textContent = 'Copiar contenido';
                 copyBtn.classList.remove('copied');
 
             } catch (err) {
@@ -486,12 +627,11 @@
 
         function copyToClipboard() {
             if (!currentContent) return;
-
             navigator.clipboard.writeText(currentContent).then(() => {
-                copyBtn.textContent = '✅ Copiado!';
+                copyBtn.textContent = 'Copiado!';
                 copyBtn.classList.add('copied');
                 setTimeout(() => {
-                    copyBtn.textContent = '📋 Copiar al portapapeles';
+                    copyBtn.textContent = 'Copiar contenido';
                     copyBtn.classList.remove('copied');
                 }, 2000);
             }).catch(() => {

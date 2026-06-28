@@ -1,3 +1,68 @@
+const SYSTEM_PROMPT = `Eres un Director de Contenido + Coach + Copywriter especializado en LinkedIn para la industria de publicidad digital, martech e inteligencia artificial.
+
+Tu misión: generar contenido que suene 100% humano, auténtico y estratégico — nunca como IA corporativa.
+
+## Temáticas válidas
+Orbita siempre estas intersecciones:
+- Publicidad Digital y Marketing moderno
+- Martech (tecnología de marketing) e Inteligencia Artificial
+- Impacto estratégico de medios en Brand & Business
+
+## Reglas de estilo
+
+✅ Hacer:
+- Lenguaje cercano pero profesional
+- Frases cortas e impactantes
+- Espacios en blanco generosos (máx. 2–3 líneas por párrafo)
+- Storytelling conectado a insights reales de la industria
+- Hooks que generen curiosidad o tensión en la primera línea
+- CTAs que inviten a debatir, no a hacer clic en un link
+
+❌ Evitar:
+- Frases de apertura genéricas: "En el dinámico mundo de...", "En el vertiginoso panorama..."
+- Palabras infladas: "Crucial", "Revolucionario", "Sin precedentes", "Disruptivo", "Game-changer"
+- Listas de bullet points sin narrativa
+- Tono corporativo o de comunicado de prensa
+- Emojis como decoración vacía — si se usan, que sean funcionales (✅ para listas de acción, 🔑 para insight clave, ❌ para contrastes). Máximo 3 por post, nunca en el hook.
+
+## Formato de entrega OBLIGATORIO
+
+Responde SIEMPRE con este formato exacto:
+
+---
+📌 POST DE LINKEDIN
+---
+
+[Texto del post listo para copiar y pegar]
+
+---
+🔍 NOTA DEL COACH
+[1–2 líneas explicando la decisión creativa principal: por qué este hook, por qué este CTA]
+---`;
+
+function buildUserMessage(mode, topic, voiceSample) {
+  const voiceContext = voiceSample
+    ? `\n\nMuestra de voz/estilo del autor (adapta el contenido a este tono):\n"""\n${voiceSample}\n"""`
+    : '';
+
+  switch (mode) {
+    case 'post':
+      return `Escribe un post de LinkedIn sobre: ${topic}${voiceContext}`;
+
+    case 'articulo':
+      return `Escribe un artículo largo de LinkedIn sobre: ${topic}${voiceContext}\n\nIncluye la estructura de secciones propuesta antes del artículo completo.`;
+
+    case 'hook':
+      return `Genera 3 opciones de hook de LinkedIn para el tema: ${topic}${voiceContext}\n\nCada hook: máximo 2 líneas, crear curiosidad o tensión, NO empezar con clichés. Incluye una línea breve explicando por qué funciona cada uno.\n\nFormatea así:\n\nHook 1: [texto]\n→ Por qué funciona: [razón]\n\nHook 2: [texto]\n→ Por qué funciona: [razón]\n\nHook 3: [texto]\n→ Por qué funciona: [razón]`;
+
+    case 'revisar':
+      return `Revisa y mejora este texto para LinkedIn, manteniendo la voz del autor pero aplicando las reglas de estilo${voiceContext}:\n\n"""\n${topic}\n"""`;
+
+    default:
+      return `Escribe un post de LinkedIn sobre: ${topic}${voiceContext}`;
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -14,16 +79,17 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { topic, context, include_image } = req.body;
+    const { topic, context, include_image, voice_sample } = req.body;
 
     const GROQ_API_KEY = process.env.GROQ_API_KEY;
     if (!GROQ_API_KEY) {
       return res.status(500).json({ error: 'Missing GROQ_API_KEY' });
     }
 
-    const isArticle = context === 'article';
+    const mode = context || 'post';
+    const isArticle = mode === 'articulo';
+    const userMessage = buildUserMessage(mode, topic, voice_sample);
 
-    // Run text and image generation concurrently
     const textPromise = fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -32,12 +98,12 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        messages: [{
-          role: 'user',
-          content: `Genera un ${isArticle ? 'artículo de LinkedIn largo' : 'post de LinkedIn breve'} sobre: ${topic}\n\nLenguaje conversacional, personal y profesional. Sin emojis.`
-        }],
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userMessage }
+        ],
         max_tokens: isArticle ? 3000 : 1500,
-        temperature: 0.7
+        temperature: 0.75
       })
     });
 
@@ -53,14 +119,29 @@ export default async function handler(req, res) {
     }
 
     const groqData = await groqResponse.json();
-    const content = groqData.choices[0].message.content;
+    const rawContent = groqData.choices[0].message.content;
 
-    return res.status(200).json({ content, image_url, type: context });
+    const { content, coachNote } = parseCoachResponse(rawContent);
+
+    return res.status(200).json({ content, coach_note: coachNote, image_url, type: mode });
 
   } catch (error) {
     console.error('Error:', error);
     return res.status(500).json({ error: error.message });
   }
+}
+
+function parseCoachResponse(raw) {
+  const coachNoteMatch = raw.match(/---\s*🔍 NOTA DEL COACH\s*\n([\s\S]*?)(?:---|$)/);
+  const coachNote = coachNoteMatch ? coachNoteMatch[1].trim() : '';
+
+  let content = raw
+    .replace(/---\s*📌 POST DE LINKEDIN\s*---\s*/g, '')
+    .replace(/---\s*🔍 NOTA DEL COACH[\s\S]*?(?:---|$)/g, '')
+    .replace(/^---\s*$/gm, '')
+    .trim();
+
+  return { content, coachNote };
 }
 
 async function fetchImage(topic) {
@@ -87,7 +168,6 @@ async function fetchImage(topic) {
     return `data:${contentType};base64,${base64}`;
 
   } catch {
-    // On timeout or error, return the URL so the browser can try directly
     return url;
   }
 }
