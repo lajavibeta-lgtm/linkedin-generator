@@ -1,0 +1,18 @@
+{
+  "buildCommand": "npm install",
+  "public": "frontend",
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/frontend/index.html"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    }
+  ],
+  "env": {
+    "GROQ_API_KEY": "@groq_api_key",
+    "HF_TOKEN": "@hf_token"
+  }
+}

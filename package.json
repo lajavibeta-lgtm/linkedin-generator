@@ -1,0 +1,12 @@
+{
+  "name": "linkedin-generator",
+  "version": "1.0.0",
+  "description": "LinkedIn Content Generator",
+  "main": "api/generate.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "npm install"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

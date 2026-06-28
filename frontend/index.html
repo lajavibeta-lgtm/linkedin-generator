@@ -398,7 +398,8 @@
                 loading.classList.add('active');
                 output.classList.remove('active');
 
-                const response = await fetch('/api/generate', {
+                const apiUrl = `${window.location.origin}/api/generate`;
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -412,7 +413,7 @@
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Error al generar el contenido');
+                    throw new Error(errorData.detail || errorData.error || 'Error al generar el contenido');
                 }
 
                 const data = await response.json();
@@ -433,7 +434,7 @@
 
             } catch (err) {
                 console.error('Error:', err);
-                showError(err.message || 'Hubo un error al conectar con el servidor. Asegúrate de que esté ejecutándose en http://localhost:8001');
+                showError(err.message || 'Hubo un error al generar el contenido. Por favor intenta de nuevo.');
             } finally {
                 loading.classList.remove('active');
             }
