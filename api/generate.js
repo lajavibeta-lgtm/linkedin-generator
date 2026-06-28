@@ -36,7 +36,7 @@ export default async function handler(req, res) {
         'Authorization': `Bearer ${GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'mixtral-8x7b-32768',
+        model: 'llama-3.3-70b-versatile',
         messages: [{
           role: 'user',
           content: `Genera un ${isArticle ? 'artículo de LinkedIn largo' : 'post de LinkedIn breve'} sobre: ${topic}\n\nLenguaje conversacional, personal y profesional. Sin emojis.`
