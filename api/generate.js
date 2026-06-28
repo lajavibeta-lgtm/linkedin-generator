@@ -23,7 +23,7 @@ Orbita siempre estas intersecciones:
 - Palabras infladas: "Crucial", "Revolucionario", "Sin precedentes", "Disruptivo", "Game-changer"
 - Listas de bullet points sin narrativa
 - Tono corporativo o de comunicado de prensa
-- Emojis como decoración vacía — si se usan, que sean funcionales (✅ para listas de acción, 🔑 para insight clave, ❌ para contrastes). Máximo 3 por post, nunca en el hook.
+- Emojis como decoración vacía. Úsalos estratégicamente: 3–5 por post, como separadores de sección o énfasis visual (✅ para listas de acción, 🔑 para insight clave, ❌ para contrastes). Nunca en la primera línea.
 
 ## Formato de entrega OBLIGATORIO
 
@@ -38,6 +38,9 @@ Responde SIEMPRE con este formato exacto:
 ---
 🔍 NOTA DEL COACH
 [1–2 líneas explicando la decisión creativa principal: por qué este hook, por qué este CTA]
+---
+🎨 PROMPT IMAGEN
+[Prompt en inglés de 1–2 frases para generar la imagen del post en un generador IA. Descripción visual concreta: escena, iluminación, paleta de colores, estilo fotográfico o ilustrativo. Profesional, adecuado para LinkedIn. Sin texto en la imagen.]
 ---`;
 
 function buildUserMessage(mode, topic, voiceSample) {
@@ -79,7 +82,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { topic, context, include_image, voice_sample } = req.body;
+    const { topic, context, voice_sample } = req.body;
 
     const GROQ_API_KEY = process.env.GROQ_API_KEY;
     if (!GROQ_API_KEY) {
@@ -90,7 +93,7 @@ export default async function handler(req, res) {
     const isArticle = mode === 'articulo';
     const userMessage = buildUserMessage(mode, topic, voice_sample);
 
-    const textPromise = fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -107,12 +110,6 @@ export default async function handler(req, res) {
       })
     });
 
-    const imagePromise = include_image
-      ? fetchImage(topic)
-      : Promise.resolve(null);
-
-    const [groqResponse, image_url] = await Promise.all([textPromise, imagePromise]);
-
     if (!groqResponse.ok) {
       const groqError = await groqResponse.json();
       throw new Error(`Groq API error: ${groqError.error?.message || 'Unknown error'}`);
@@ -121,9 +118,9 @@ export default async function handler(req, res) {
     const groqData = await groqResponse.json();
     const rawContent = groqData.choices[0].message.content;
 
-    const { content, coachNote } = parseCoachResponse(rawContent);
+    const { content, coachNote, imagePrompt } = parseCoachResponse(rawContent);
 
-    return res.status(200).json({ content, coach_note: coachNote, image_url, type: mode });
+    return res.status(200).json({ content, coach_note: coachNote, image_prompt: imagePrompt, type: mode });
 
   } catch (error) {
     console.error('Error:', error);
@@ -132,8 +129,11 @@ export default async function handler(req, res) {
 }
 
 function parseCoachResponse(raw) {
-  const coachNoteMatch = raw.match(/---\s*🔍 NOTA DEL COACH\s*\n([\s\S]*?)(?:---|$)/);
+  const coachNoteMatch = raw.match(/---\s*🔍 NOTA DEL COACH\s*\n([\s\S]*?)(?=---)/);
   const coachNote = coachNoteMatch ? coachNoteMatch[1].trim() : '';
+
+  const imagePromptMatch = raw.match(/---\s*🎨 PROMPT IMAGEN\s*\n([\s\S]*?)(?:---|$)/);
+  const imagePrompt = imagePromptMatch ? imagePromptMatch[1].trim() : '';
 
   let content = raw
     .replace(/---\s*📌 POST DE LINKEDIN\s*---\s*/g, '')
@@ -141,33 +141,5 @@ function parseCoachResponse(raw) {
     .replace(/^---\s*$/gm, '')
     .trim();
 
-  return { content, coachNote };
-}
-
-async function fetchImage(topic) {
-  const encodedPrompt = encodeURIComponent(`Professional LinkedIn visual for: ${topic}, modern, clean, business`);
-  const seed = Math.floor(Math.random() * 999999);
-  const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=flux&width=1024&height=768&nologo=true&seed=${seed}`;
-
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: { 'Accept': 'image/*' }
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) return url;
-
-    const contentType = response.headers.get('content-type') || 'image/jpeg';
-    const arrayBuffer = await response.arrayBuffer();
-    const base64 = Buffer.from(arrayBuffer).toString('base64');
-    return `data:${contentType};base64,${base64}`;
-
-  } catch {
-    return url;
-  }
+  return { content, coachNote, imagePrompt };
 }

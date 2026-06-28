@@ -319,34 +319,56 @@
             font-style: italic;
         }
 
-        .output-image {
-            margin: 1rem 0;
-            border-radius: 12px;
-            max-width: 100%;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            display: block;
+        .image-prompt-header {
+            background: #f5f0ff;
+            color: #6200ea;
+            border: 2px solid #d9c8ff;
+            border-bottom: none;
         }
 
-        .image-loading {
-            margin: 1rem 0;
-            padding: 1.5rem;
-            background: #f0f0f0;
-            border-radius: 10px;
-            text-align: center;
-            color: #0a66c2;
-            font-weight: 500;
-            font-size: 0.9rem;
+        .image-prompt-body {
+            background: #faf8ff;
+            padding: 1rem 1.5rem;
+            border: 2px solid #d9c8ff;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
         }
 
-        .image-error {
-            margin: 1rem 0;
-            padding: 0.85rem 1rem;
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            border-radius: 8px;
-            color: #856404;
-            font-size: 0.85rem;
+        .image-prompt-textarea {
+            width: 100%;
+            min-height: 80px;
+            resize: vertical;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: #333;
+            background: white;
+            border: 1px solid #d9c8ff;
+            border-radius: 6px;
+            padding: 0.6rem 0.8rem;
+            font-family: inherit;
+            margin-bottom: 0.5rem;
         }
+
+        .btn-copy-prompt {
+            width: 100%;
+            background: #6200ea;
+            color: white;
+            padding: 0.65rem 1.5rem;
+            font-size: 0.88rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-copy-prompt:hover {
+            background: #4a00b0;
+            transform: translateY(-1px);
+        }
+
+        .btn-copy-prompt.copied { background: #4caf50; }
 
         .btn-copy {
             width: 100%;
@@ -419,13 +441,6 @@
                 <div class="hint">Cuanto más auténtica la muestra, más fiel será el resultado al "Espejo de Identidad".</div>
             </div>
 
-            <div class="form-group">
-                <div class="checkbox-group">
-                    <input type="checkbox" id="generateImage" name="generateImage">
-                    <label for="generateImage">Generar imagen para el post</label>
-                </div>
-            </div>
-
             <div class="button-group">
                 <button type="submit" class="btn-submit">Generar contenido</button>
                 <button type="reset" class="btn-reset" onclick="resetForm()">Limpiar</button>
@@ -457,9 +472,15 @@
                 <div class="coach-note" id="coachNote"></div>
             </div>
 
-            <div id="imageLoading" class="image-loading" style="display: none;">Cargando imagen...</div>
-            <div id="imageError" class="image-error" style="display: none;">No se pudo cargar la imagen. El contenido está disponible arriba.</div>
-            <img id="outputImage" class="output-image" style="display: none;" alt="Imagen generada">
+            <div class="output-section" id="imagePromptSection" style="display:none">
+                <div class="output-section-header image-prompt-header">
+                    🎨 Prompt para imagen · Nano Banana Pro / Firefly / Midjourney
+                </div>
+                <div class="image-prompt-body">
+                    <textarea id="imagePromptText" class="image-prompt-textarea" readonly></textarea>
+                    <button type="button" class="btn-copy-prompt" id="copyPromptBtn" onclick="copyImagePrompt()">Copiar prompt</button>
+                </div>
+            </div>
 
             <button type="button" class="btn-copy" id="copyBtn" onclick="copyToClipboard()">Copiar contenido</button>
         </div>
@@ -473,11 +494,10 @@
         const errorMessage = document.getElementById('errorMessage');
         const output = document.getElementById('output');
         const outputContent = document.getElementById('outputContent');
-        const outputImage = document.getElementById('outputImage');
-        const imageLoading = document.getElementById('imageLoading');
-        const imageError = document.getElementById('imageError');
         const coachSection = document.getElementById('coachSection');
         const coachNote = document.getElementById('coachNote');
+        const imagePromptSection = document.getElementById('imagePromptSection');
+        const imagePromptText = document.getElementById('imagePromptText');
         const copyBtn = document.getElementById('copyBtn');
         const topicLabel = document.getElementById('topicLabel');
         const topicHint = document.getElementById('topicHint');
@@ -542,7 +562,6 @@
 
             const topic = topicField.value.trim();
             const contentType = document.getElementById('contentType').value;
-            const generateImage = document.getElementById('generateImage').checked;
             const voiceSample = document.getElementById('voiceSample').value.trim();
 
             if (!topic || !contentType) {
@@ -565,7 +584,6 @@
                     body: JSON.stringify({
                         topic,
                         context: contentType,
-                        include_image: generateImage,
                         voice_sample: voiceSample || null
                     })
                 });
@@ -587,21 +605,13 @@
                     coachSection.style.display = 'none';
                 }
 
-                imageLoading.style.display = 'none';
-                imageError.style.display = 'none';
-                outputImage.style.display = 'none';
-
-                if (data.image_url) {
-                    imageLoading.style.display = 'block';
-                    outputImage.onload = () => {
-                        imageLoading.style.display = 'none';
-                        outputImage.style.display = 'block';
-                    };
-                    outputImage.onerror = () => {
-                        imageLoading.style.display = 'none';
-                        imageError.style.display = 'block';
-                    };
-                    outputImage.src = data.image_url;
+                if (data.image_prompt) {
+                    imagePromptText.value = data.image_prompt;
+                    imagePromptSection.style.display = 'block';
+                    document.getElementById('copyPromptBtn').textContent = 'Copiar prompt';
+                    document.getElementById('copyPromptBtn').classList.remove('copied');
+                } else {
+                    imagePromptSection.style.display = 'none';
                 }
 
                 output.classList.add('active');
@@ -633,6 +643,22 @@
                 setTimeout(() => {
                     copyBtn.textContent = 'Copiar contenido';
                     copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                showError('No se pudo copiar al portapapeles');
+            });
+        }
+
+        function copyImagePrompt() {
+            const text = imagePromptText.value;
+            if (!text) return;
+            const btn = document.getElementById('copyPromptBtn');
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copiado!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copiar prompt';
+                    btn.classList.remove('copied');
                 }, 2000);
             }).catch(() => {
                 showError('No se pudo copiar al portapapeles');
