@@ -123,3 +123,43 @@ HF_TOKEN=hf_Tu_Token_Aqui
 OBSIDIAN_VAULT_PATH=/ruta/a/tu/Obsidian/Vault
 PORT=8000
 ```
+**Ejemplos de rutas:**
+Mac: /Users/javiera.betancourt/Library/CloudStorage/OneDrive-insidemedia.net/Documents/Obsidian/linkedin-generator
+
+### 6️⃣ Ejecutar el servidor
+
+```bash
+python backend/main.py
+```
+
+Deberías ver:http://0.0.0.0:8000/
+
+### 7️⃣ Abrir en navegador
+
+## 💡 Cómo Usar
+
+¡Listo! 🎉
+
+---
+
+### Generar un Post
+
+1. En la interfaz, ingresa un tema (ej: "Marketing Digital")
+2. Selecciona **"Post"** como tipo de contenido
+3. Marca "Generar imagen" si deseas
+4. Haz clic en **"✨ Generar Contenido"**
+5. Espera 10-30 segundos
+6. Copia el contenido o guarda en Obsidian
+
+### Generar un Artículo
+
+1. Ingresa el tema
+2. Selecciona **"Artículo"** como tipo
+3. Marca "Generar imagen"
+4. Haz clic en generar
+5. Espera 30-60 segundos (es más largo)
+6. Copia o guarda
+
+### Guardar en Obsidian
+
+Tus generaciones se guardan automáticamente en la carpeta:

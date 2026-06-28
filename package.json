@@ -1,12 +1,25 @@
 {
   "name": "linkedin-generator",
   "version": "1.0.0",
-  "description": "LinkedIn Content Generator",
+  "description": "LinkedIn Content Generator with Groq & Hugging Face",
   "main": "api/generate.js",
   "scripts": {
     "dev": "vercel dev",
-    "build": "npm install"
+    "build": "echo 'No build needed'",
+    "start": "vercel dev"
   },
+  "keywords": [
+    "linkedin",
+    "content-generator",
+    "groq",
+    "hugging-face",
+    "ai",
+    "serverless"
+  ],
+  "author": "LinkedIn Generator Contributors",
+  "license": "MIT",
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "vercel": "^latest"
+  }
 }
