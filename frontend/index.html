@@ -385,6 +385,103 @@
 
         .btn-copy.copied { background: #4caf50; }
 
+        .linkedin-connect-area {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .btn-linkedin-connect {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1.5px solid rgba(255,255,255,0.45);
+            padding: 0.35rem 1rem;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-linkedin-connect:hover {
+            background: rgba(255,255,255,0.25);
+            border-color: rgba(255,255,255,0.7);
+        }
+
+        .btn-linkedin-connect.connected {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .btn-linkedin-disconnect {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.72rem;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            text-decoration: underline;
+            font-family: inherit;
+            padding: 0;
+        }
+
+        .btn-linkedin-disconnect:hover { color: white; }
+
+        .btn-linkedin-post {
+            width: 100%;
+            background: #0a66c2;
+            color: white;
+            padding: 0.85rem 1.5rem;
+            margin-top: 0.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-linkedin-post:hover:not(:disabled) {
+            background: #004182;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(10, 102, 194, 0.35);
+        }
+
+        .btn-linkedin-post:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .linkedin-post-status {
+            margin-top: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .linkedin-post-status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1.5px solid #c8e6c9;
+        }
+
+        .linkedin-post-status.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1.5px solid #ffcdd2;
+        }
+
         @media (max-width: 600px) {
             .container { padding: 1.5rem; }
             .header { padding: 1.5rem; margin: -1.5rem -1.5rem 1.5rem -1.5rem; }
@@ -401,6 +498,12 @@
             <div class="badge">Powered by Groq · llama-3.3-70b</div>
             <h1>LinkedIn Content Coach</h1>
             <p>Contenido auténtico para publicidad digital, martech e IA</p>
+            <div class="linkedin-connect-area" id="linkedinConnectArea">
+                <a href="/api/linkedin-auth" class="btn-linkedin-connect" id="linkedinConnectBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    Conectar LinkedIn
+                </a>
+            </div>
         </div>
 
         <form id="contentForm">
@@ -483,6 +586,11 @@
             </div>
 
             <button type="button" class="btn-copy" id="copyBtn" onclick="copyToClipboard()">Copiar contenido</button>
+            <button type="button" class="btn-linkedin-post" id="linkedinPostBtn" style="display:none" onclick="postToLinkedIn()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                Publicar en LinkedIn
+            </button>
+            <div class="linkedin-post-status" id="linkedinPostStatus" style="display:none"></div>
         </div>
     </div>
 
@@ -549,6 +657,8 @@
 
         function resetForm() {
             output.classList.remove('active');
+            document.getElementById('linkedinPostBtn').style.display = 'none';
+            document.getElementById('linkedinPostStatus').style.display = 'none';
             closeError();
             topicLabel.textContent = 'Tema o idea';
             topicField.placeholder = 'Ej: Las agencias que no adopten IA van a desaparecer...';
@@ -617,6 +727,10 @@
                 output.classList.add('active');
                 copyBtn.textContent = 'Copiar contenido';
                 copyBtn.classList.remove('copied');
+                document.getElementById('linkedinPostStatus').style.display = 'none';
+                if (localStorage.getItem('li_token')) {
+                    document.getElementById('linkedinPostBtn').style.display = 'flex';
+                }
 
             } catch (err) {
                 console.error('Error:', err);
@@ -664,6 +778,119 @@
                 showError('No se pudo copiar al portapapeles');
             });
         }
+
+        // ── LinkedIn OAuth ──────────────────────────────────────────────
+
+        function initLinkedIn() {
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('linkedin_token');
+            const urn = params.get('linkedin_urn');
+            const name = params.get('linkedin_name');
+            const err = params.get('linkedin_error');
+
+            if (token && urn) {
+                localStorage.setItem('li_token', token);
+                localStorage.setItem('li_urn', urn);
+                if (name) localStorage.setItem('li_name', name);
+                history.replaceState({}, '', '/');
+            } else if (err) {
+                showError('Error al conectar LinkedIn: ' + decodeURIComponent(err));
+                history.replaceState({}, '', '/');
+            }
+
+            updateLinkedInUI();
+        }
+
+        function updateLinkedInUI() {
+            const token = localStorage.getItem('li_token');
+            const name = localStorage.getItem('li_name');
+            const area = document.getElementById('linkedinConnectArea');
+            const postBtn = document.getElementById('linkedinPostBtn');
+
+            if (token) {
+                const label = name ? `LinkedIn: ${name}` : 'LinkedIn conectado ✓';
+                area.innerHTML = `
+                    <span class="btn-linkedin-connect connected">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        ${label}
+                    </span>
+                    <button class="btn-linkedin-disconnect" onclick="disconnectLinkedIn()">Desconectar</button>
+                `;
+                if (output.classList.contains('active')) postBtn.style.display = 'flex';
+            } else {
+                area.innerHTML = `
+                    <a href="/api/linkedin-auth" class="btn-linkedin-connect">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        Conectar LinkedIn
+                    </a>
+                `;
+                postBtn.style.display = 'none';
+            }
+        }
+
+        function disconnectLinkedIn() {
+            localStorage.removeItem('li_token');
+            localStorage.removeItem('li_urn');
+            localStorage.removeItem('li_name');
+            updateLinkedInUI();
+        }
+
+        async function postToLinkedIn() {
+            const token = localStorage.getItem('li_token');
+            const urn = localStorage.getItem('li_urn');
+            if (!token || !urn || !currentContent) return;
+
+            const btn = document.getElementById('linkedinPostBtn');
+            const statusEl = document.getElementById('linkedinPostStatus');
+
+            btn.disabled = true;
+            btn.innerHTML = `<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite"></span> Publicando...`;
+            statusEl.style.display = 'none';
+            statusEl.className = 'linkedin-post-status';
+
+            try {
+                const res = await fetch('/api/linkedin-post', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: currentContent, access_token: token, person_urn: urn })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        disconnectLinkedIn();
+                        showError(data.error || 'Token expirado. Reconecta tu cuenta de LinkedIn.');
+                    } else {
+                        statusEl.textContent = data.error || 'Error al publicar en LinkedIn';
+                        statusEl.className = 'linkedin-post-status error';
+                        statusEl.style.display = 'block';
+                    }
+                } else {
+                    statusEl.textContent = 'Publicado en LinkedIn exitosamente!';
+                    statusEl.className = 'linkedin-post-status success';
+                    statusEl.style.display = 'block';
+                }
+            } catch (err) {
+                statusEl.textContent = 'Error de conexión al publicar';
+                statusEl.className = 'linkedin-post-status error';
+                statusEl.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> Publicar en LinkedIn`;
+            }
+        }
+
+        // Show "Publicar" button whenever output becomes visible and LinkedIn is connected
+        const origShowOutput = () => {
+            output.classList.add('active');
+            if (localStorage.getItem('li_token')) {
+                document.getElementById('linkedinPostBtn').style.display = 'flex';
+            }
+            document.getElementById('linkedinPostStatus').style.display = 'none';
+        };
+
+        initLinkedIn();
     </script>
 </body>
 </html>
