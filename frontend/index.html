@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 LinkedIn Content Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 3rem;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            margin: -3rem -3rem 2rem -3rem;
+            text-align: center;
+            border-bottom: 5px solid #667eea;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.9rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            grid-column: 1 / 2;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-reset {
+            background: #f0f0f0;
+            color: #666;
+            grid-column: 2 / 3;
+        }
+
+        .btn-reset:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .btn-reset:active {
+            transform: translateY(0);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 1rem;
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .error {
+            display: none;
+            background: #fee;
+            border: 2px solid #fcc;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 2rem;
+            color: #c33;
+            font-weight: 500;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .error-close {
+            float: right;
+            cursor: pointer;
+            font-weight: bold;
+            color: #c33;
+        }
+
+        .output {
+            display: none;
+            margin-top: 2rem;
+            padding: 2rem;
+            background: #f9f9f9;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .output.active {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .output-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .output-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 1.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .output-image {
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            max-width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .button-group-output {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-copy {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.9rem 1.5rem;
+        }
+
+        .btn-copy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-copy.copied {
+            background: #4caf50;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .header {
+                padding: 1.5rem;
+                margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-submit,
+            .btn-reset {
+                grid-column: 1 / 2;
+            }
+
+            .output-content {
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 LinkedIn Content Generator</h1>
+            <p>Crea contenido profesional optimizado para LinkedIn en segundos</p>
+        </div>
+
+        <form id="contentForm">
+            <div class="form-group">
+                <label for="topic">📌 Tema a desarrollar</label>
+                <input
+                    type="text"
+                    id="topic"
+                    name="topic"
+                    placeholder="Ej: Marketing digital, Productividad, Liderazgo..."
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="contentType">📄 Tipo de contenido</label>
+                <select id="contentType" name="contentType" required>
+                    <option value="">Selecciona un tipo...</option>
+                    <option value="post">📱 Post (breve)</option>
+                    <option value="article">📄 Artículo (largo)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="generateImage" name="generateImage">
+                    <label for="generateImage">🖼️ Generar imagen para el contenido</label>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-submit">✨ Generar Contenido</button>
+                <button type="reset" class="btn-reset">🗑️ Limpiar</button>
+            </div>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Generando tu contenido...</div>
+        </div>
+
+        <div class="error" id="error">
+            <span class="error-close" onclick="closeError()">&times;</span>
+            <div id="errorMessage"></div>
+        </div>
+
+        <div class="output" id="output">
+            <div class="output-title">✅ Tu contenido está listo</div>
+            <div class="output-content" id="outputContent"></div>
+            <img id="outputImage" class="output-image" style="display: none;" alt="Imagen generada">
+            <div class="button-group-output">
+                <button type="button" class="btn-copy" id="copyBtn" onclick="copyToClipboard()">📋 Copiar al portapapeles</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('contentForm');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const errorMessage = document.getElementById('errorMessage');
+        const output = document.getElementById('output');
+        const outputContent = document.getElementById('outputContent');
+        const outputImage = document.getElementById('outputImage');
+        const copyBtn = document.getElementById('copyBtn');
+
+        let currentContent = '';
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const topic = document.getElementById('topic').value.trim();
+            const contentType = document.getElementById('contentType').value;
+            const generateImage = document.getElementById('generateImage').checked;
+
+            if (!topic || !contentType) {
+                showError('Por favor completa todos los campos requeridos.');
+                return;
+            }
+
+            try {
+                closeError();
+                loading.classList.add('active');
+                output.classList.remove('active');
+
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        topic: topic,
+                        context: contentType,
+                        include_image: generateImage
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error al generar el contenido');
+                }
+
+                const data = await response.json();
+
+                currentContent = data.content;
+                outputContent.textContent = data.content;
+
+                if (data.image_url) {
+                    outputImage.src = data.image_url;
+                    outputImage.style.display = 'block';
+                } else {
+                    outputImage.style.display = 'none';
+                }
+
+                output.classList.add('active');
+                copyBtn.textContent = '📋 Copiar al portapapeles';
+                copyBtn.classList.remove('copied');
+
+            } catch (err) {
+                console.error('Error:', err);
+                showError(err.message || 'Hubo un error al conectar con el servidor. Asegúrate de que esté ejecutándose en http://localhost:8001');
+            } finally {
+                loading.classList.remove('active');
+            }
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            error.classList.add('active');
+        }
+
+        function closeError() {
+            error.classList.remove('active');
+        }
+
+        function copyToClipboard() {
+            if (!currentContent) return;
+
+            navigator.clipboard.writeText(currentContent).then(() => {
+                copyBtn.textContent = '✅ Copiado!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 Copiar al portapapeles';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                showError('No se pudo copiar al portapapeles');
+            });
+        }
+    </script>
+</body>
+</html>
