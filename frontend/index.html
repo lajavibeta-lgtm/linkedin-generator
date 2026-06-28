@@ -255,6 +255,27 @@
             border-radius: 12px;
             max-width: 100%;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: block;
+        }
+
+        .image-loading {
+            margin: 1.5rem 0;
+            padding: 2rem;
+            background: #f0f0f0;
+            border-radius: 12px;
+            text-align: center;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .image-error {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            color: #856404;
+            font-size: 0.9rem;
         }
 
         .button-group-output {
@@ -362,6 +383,8 @@
         <div class="output" id="output">
             <div class="output-title">✅ Tu contenido está listo</div>
             <div class="output-content" id="outputContent"></div>
+            <div id="imageLoading" class="image-loading" style="display: none;">🖼️ Cargando imagen...</div>
+            <div id="imageError" class="image-error" style="display: none;">No se pudo cargar la imagen. El contenido está disponible arriba.</div>
             <img id="outputImage" class="output-image" style="display: none;" alt="Imagen generada">
             <div class="button-group-output">
                 <button type="button" class="btn-copy" id="copyBtn" onclick="copyToClipboard()">📋 Copiar al portapapeles</button>
@@ -377,6 +400,8 @@
         const output = document.getElementById('output');
         const outputContent = document.getElementById('outputContent');
         const outputImage = document.getElementById('outputImage');
+        const imageLoading = document.getElementById('imageLoading');
+        const imageError = document.getElementById('imageError');
         const copyBtn = document.getElementById('copyBtn');
 
         let currentContent = '';
@@ -421,11 +446,21 @@
                 currentContent = data.content;
                 outputContent.textContent = data.content;
 
+                imageLoading.style.display = 'none';
+                imageError.style.display = 'none';
+                outputImage.style.display = 'none';
+
                 if (data.image_url) {
+                    imageLoading.style.display = 'block';
+                    outputImage.onload = () => {
+                        imageLoading.style.display = 'none';
+                        outputImage.style.display = 'block';
+                    };
+                    outputImage.onerror = () => {
+                        imageLoading.style.display = 'none';
+                        imageError.style.display = 'block';
+                    };
                     outputImage.src = data.image_url;
-                    outputImage.style.display = 'block';
-                } else {
-                    outputImage.style.display = 'none';
                 }
 
                 output.classList.add('active');

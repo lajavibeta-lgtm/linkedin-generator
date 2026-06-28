@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Habilitar CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -18,17 +17,14 @@ export default async function handler(req, res) {
     const { topic, context, include_image } = req.body;
 
     const GROQ_API_KEY = process.env.GROQ_API_KEY;
-    const HF_TOKEN = process.env.HF_TOKEN;
 
-    if (!GROQ_API_KEY || !HF_TOKEN) {
-      return res.status(500).json({ error: 'Missing API keys' });
+    if (!GROQ_API_KEY) {
+      return res.status(500).json({ error: 'Missing GROQ_API_KEY' });
     }
 
-    // Determinar tipo de contenido basado en context
     const isArticle = context === 'article';
     const maxTokens = isArticle ? 3000 : 1500;
 
-    // Llamar a Groq API directamente
     const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -57,21 +53,33 @@ export default async function handler(req, res) {
     let image_url = null;
 
     if (include_image) {
+      const encodedPrompt = encodeURIComponent(`Professional LinkedIn visual for: ${topic}, modern, clean, business`);
+      const seed = Math.floor(Math.random() * 999999);
+      const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=flux&width=1024&height=768&nologo=true&seed=${seed}`;
+
       try {
-        const imageResponse = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev', {
-          headers: { Authorization: `Bearer ${HF_TOKEN}` },
-          method: 'POST',
-          body: JSON.stringify({ inputs: `Professional LinkedIn visual for: ${topic}` }),
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+        const imgResponse = await fetch(pollinationsUrl, {
+          signal: controller.signal,
+          headers: { 'Accept': 'image/*' }
         });
 
-        if (imageResponse.ok) {
-          const imageBuffer = await imageResponse.arrayBuffer();
-          const base64 = Buffer.from(imageBuffer).toString('base64');
-          image_url = `data:image/jpeg;base64,${base64}`;
+        clearTimeout(timeoutId);
+
+        if (imgResponse.ok) {
+          const contentType = imgResponse.headers.get('content-type') || 'image/jpeg';
+          const arrayBuffer = await imgResponse.arrayBuffer();
+          const base64 = Buffer.from(arrayBuffer).toString('base64');
+          image_url = `data:${contentType};base64,${base64}`;
+        } else {
+          image_url = pollinationsUrl;
         }
-      } catch (imageError) {
-        console.warn('Image generation failed:', imageError.message);
-        // No fallar si la imagen no se genera
+      } catch (imgError) {
+        console.error('Image fetch error:', imgError.message);
+        // Fall back to the URL so the browser can try directly
+        image_url = pollinationsUrl;
       }
     }
 
