@@ -20,6 +20,6 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "vercel": "^latest"
+    "vercel": "latest"
   }
 }
