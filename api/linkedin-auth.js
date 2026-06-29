@@ -8,7 +8,8 @@ export default function handler(req, res) {
   const host = req.headers.host;
   const redirectUri = `${proto}://${host}/api/linkedin-callback`;
 
-  const state = Math.random().toString(36).slice(2, 18);
+  const { randomBytes } = await import('crypto');
+  const state = randomBytes(16).toString('hex');
   const isProduction = proto === 'https';
   const cookieFlags = `HttpOnly; SameSite=Lax; Path=/; Max-Age=600${isProduction ? '; Secure' : ''}`;
 

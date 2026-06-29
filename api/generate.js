@@ -132,14 +132,24 @@ ${topic}
   }
 }
 
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN;
+
+function setCorsHeaders(req, res) {
+  const origin = req.headers.origin;
+  if (ALLOWED_ORIGIN && origin === ALLOWED_ORIGIN) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else if (!ALLOWED_ORIGIN) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+  setCorsHeaders(req, res);
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
+    res.status(204).end();
     return;
   }
 
@@ -149,6 +159,25 @@ export default async function handler(req, res) {
 
   try {
     const { topic, context, voice_sample, author_profile } = req.body;
+
+    if (typeof topic !== 'string' || !topic.trim()) {
+      return res.status(400).json({ error: 'Topic is required' });
+    }
+    if (topic.length > 500) {
+      return res.status(400).json({ error: 'Topic must be 500 characters or fewer' });
+    }
+    if (voice_sample && typeof voice_sample !== 'string') {
+      return res.status(400).json({ error: 'Invalid voice_sample' });
+    }
+    if (voice_sample && voice_sample.length > 5000) {
+      return res.status(400).json({ error: 'Voice sample must be 5000 characters or fewer' });
+    }
+    if (author_profile && typeof author_profile !== 'string') {
+      return res.status(400).json({ error: 'Invalid author_profile' });
+    }
+    if (author_profile && author_profile.length > 2000) {
+      return res.status(400).json({ error: 'Author profile must be 2000 characters or fewer' });
+    }
 
     const GROQ_API_KEY = process.env.GROQ_API_KEY;
     if (!GROQ_API_KEY) {
@@ -189,8 +218,8 @@ export default async function handler(req, res) {
     return res.status(200).json({ content, coach_note: coachNote, image_prompt: imagePrompt, type: mode });
 
   } catch (error) {
-    console.error('Error:', error);
-    return res.status(500).json({ error: error.message });
+    console.error('Generate error:', error);
+    return res.status(500).json({ error: 'Content generation failed. Please try again.' });
   }
 }
 

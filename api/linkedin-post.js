@@ -1,10 +1,16 @@
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN;
+
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
+  const origin = req.headers.origin;
+  if (ALLOWED_ORIGIN && origin === ALLOWED_ORIGIN) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else if (!ALLOWED_ORIGIN) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { content, access_token, person_urn } = req.body;
@@ -42,14 +48,17 @@ export default async function handler(req, res) {
       if (postRes.status === 401) {
         return res.status(401).json({ error: 'Token expirado o inválido. Reconecta tu cuenta de LinkedIn.' });
       }
-      return res.status(postRes.status).json({ error: 'Error al publicar en LinkedIn', details: errText });
+      return res.status(postRes.status).json({ error: 'Error al publicar en LinkedIn. Intenta nuevamente.' });
     }
 
-    const postData = await postRes.json();
-    return res.status(200).json({ success: true, postId: postData.id });
+    const postId = postRes.headers.get('x-restli-id') || '';
+    const postUrl = postId
+      ? `https://www.linkedin.com/feed/update/${encodeURIComponent(postId)}/`
+      : 'https://www.linkedin.com/feed/';
+    return res.status(200).json({ success: true, postId, postUrl });
 
   } catch (err) {
-    console.error('Post error:', err);
-    return res.status(500).json({ error: err.message });
+    console.error('LinkedIn post error:', err);
+    return res.status(500).json({ error: 'Failed to post to LinkedIn. Please try again.' });
   }
 }

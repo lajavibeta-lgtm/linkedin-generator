@@ -64,7 +64,7 @@ export default async function handler(req, res) {
       linkedin_urn: personUrn,
       linkedin_name: name
     });
-    res.redirect(302, `/?${params}`);
+    res.redirect(302, `/#${params}`);
 
   } catch (err) {
     console.error('Callback error:', err);

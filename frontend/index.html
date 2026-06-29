@@ -906,7 +906,8 @@
         // ── LinkedIn OAuth ──────────────────────────────────────────────
 
         function initLinkedIn() {
-            const params = new URLSearchParams(window.location.search);
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
             const token = params.get('linkedin_token');
             const urn = params.get('linkedin_urn');
             const name = params.get('linkedin_name');
@@ -991,8 +992,16 @@
                         statusEl.style.display = 'block';
                     }
                 } else {
-                    window.open(data.postUrl || 'https://www.linkedin.com/feed/', '_blank');
-                    statusEl.innerHTML = '✓ Publicado en LinkedIn. <a href="' + (data.postUrl || 'https://www.linkedin.com/feed/') + '" target="_blank" rel="noopener" style="color:inherit;font-weight:600;">Ver post →</a>';
+                    const postUrl = data.postUrl || 'https://www.linkedin.com/feed/';
+                    window.open(postUrl, '_blank');
+                    statusEl.textContent = '✓ Publicado en LinkedIn. ';
+                    const postLink = document.createElement('a');
+                    postLink.href = postUrl;
+                    postLink.textContent = 'Ver post →';
+                    postLink.target = '_blank';
+                    postLink.rel = 'noopener noreferrer';
+                    postLink.style.cssText = 'color:inherit;font-weight:600;';
+                    statusEl.appendChild(postLink);
                     statusEl.className = 'linkedin-post-status success';
                     statusEl.style.display = 'block';
                 }
