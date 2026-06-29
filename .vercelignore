@@ -1,0 +1,9 @@
+backend/
+requirements.txt
+generated_posts/
+generated_images/
+linkedin-generator/
+linkedin-coach.md
+config.json
+*.md
+!CLAUDE.md
