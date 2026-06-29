@@ -113,6 +113,37 @@
             margin-top: 0.3rem;
         }
 
+        .profile-loaded {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.82rem;
+            color: #0a66c2;
+            font-weight: 600;
+            margin-bottom: 1.4rem;
+            background: #f0f7ff;
+            border: 1.5px solid #c8dff8;
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+        }
+
+        .profile-loaded svg { flex-shrink: 0; }
+
+        .optional-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            color: #888;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            margin-top: -0.6rem;
+            user-select: none;
+        }
+
+        .optional-toggle:hover { color: #555; }
+
         .voice-toggle {
             display: flex;
             align-items: center;
@@ -136,6 +167,38 @@
 
         .voice-section.open {
             display: block;
+        }
+
+        .profile-section {
+            display: none;
+            background: #f0f7ff;
+            border: 1.5px solid #c8dff8;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .profile-section.open { display: block; }
+
+        .profile-section label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #0a66c2;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-section textarea {
+            background: white;
+            border-color: #c8dff8;
+            font-size: 0.88rem;
+        }
+
+        .profile-section .hint {
+            color: #0a66c2;
+            opacity: 0.75;
         }
 
         .checkbox-group {
@@ -530,6 +593,26 @@
                 <div class="hint" id="topicHint">Cuanto más específico seas, mejor el resultado.</div>
             </div>
 
+            <div class="profile-loaded">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                Perfil de Javiera cargado · WPP Media Solutions LATAM
+            </div>
+
+            <div class="optional-toggle" id="profileToggle" onclick="toggleProfile()">
+                <span id="profileArrow">▶</span> Agregar contexto extra (opcional)
+            </div>
+            <div class="profile-section" id="profileSection">
+                <label for="authorProfile">Contexto adicional</label>
+                <textarea
+                    id="authorProfile"
+                    name="authorProfile"
+                    placeholder="Ej: Este post es para anunciar mi participación en Cannes Lions. El tono debe ser más entusiasta de lo normal."
+                    rows="2"
+                    oninput="saveProfile()"
+                ></textarea>
+                <div class="hint">Se suma al perfil base ya configurado. Se guarda en el navegador.</div>
+            </div>
+
             <div class="voice-toggle" id="voiceToggle" onclick="toggleVoice()">
                 <span id="voiceArrow">▶</span> Agregar muestra de tu voz (opcional)
             </div>
@@ -538,10 +621,11 @@
                 <textarea
                     id="voiceSample"
                     name="voiceSample"
-                    placeholder="Pega aquí posts de LinkedIn que hayas escrito. El coach los usará para calibrar tu tono y estilo antes de escribir."
+                    placeholder="Pega aquí 1–2 posts de LinkedIn que hayas escrito y te hayan gustado. El coach calibra tu tono y ritmo a partir de ellos."
                     rows="5"
+                    oninput="saveVoiceSample()"
                 ></textarea>
-                <div class="hint">Cuanto más auténtica la muestra, más fiel será el resultado al "Espejo de Identidad".</div>
+                <div class="hint">Se guarda en el navegador. No es necesario volver a pegarlo en cada sesión.</div>
             </div>
 
             <div class="button-group">
@@ -648,11 +732,51 @@
             topicHint.textContent = cfg.hint;
         });
 
+        function saveProfile() {
+            localStorage.setItem('author_profile', document.getElementById('authorProfile').value);
+        }
+
+        function saveVoiceSample() {
+            localStorage.setItem('voice_sample', document.getElementById('voiceSample').value);
+        }
+
+        function loadPersisted() {
+            const profile = localStorage.getItem('author_profile');
+            const voice = localStorage.getItem('voice_sample');
+            if (profile && profile.trim()) {
+                document.getElementById('authorProfile').value = profile;
+                document.getElementById('profileSection').classList.add('open');
+                document.getElementById('profileArrow').textContent = '▼';
+            }
+            if (voice && voice.trim()) {
+                document.getElementById('voiceSample').value = voice;
+                document.getElementById('voiceSection').classList.add('open');
+                document.getElementById('voiceArrow').textContent = '▼';
+            }
+        }
+
+        function toggleProfile() {
+            const section = document.getElementById('profileSection');
+            const arrow = document.getElementById('profileArrow');
+            const isOpen = section.classList.toggle('open');
+            arrow.textContent = isOpen ? '▼' : '▶';
+        }
+
         function toggleVoice() {
             const section = document.getElementById('voiceSection');
             const arrow = document.getElementById('voiceArrow');
             const isOpen = section.classList.toggle('open');
             arrow.textContent = isOpen ? '▼' : '▶';
+        }
+
+        function cleanForLinkedIn(text) {
+            return text
+                .replace(/\*\*(.+?)\*\*/gs, '$1')
+                .replace(/__(.+?)__/gs, '$1')
+                .replace(/\*(.+?)\*/gs, '$1')
+                .replace(/_(.+?)_/gs, '$1')
+                .replace(/^[-*+•] /gm, '')
+                .replace(/^#{1,6} /gm, '');
         }
 
         function resetForm() {
@@ -663,8 +787,6 @@
             topicLabel.textContent = 'Tema o idea';
             topicField.placeholder = 'Ej: Las agencias que no adopten IA van a desaparecer...';
             topicHint.textContent = 'Cuanto más específico seas, mejor el resultado.';
-            document.getElementById('voiceSection').classList.remove('open');
-            document.getElementById('voiceArrow').textContent = '▶';
         }
 
         form.addEventListener('submit', async (e) => {
@@ -673,6 +795,7 @@
             const topic = topicField.value.trim();
             const contentType = document.getElementById('contentType').value;
             const voiceSample = document.getElementById('voiceSample').value.trim();
+            const authorProfile = document.getElementById('authorProfile').value.trim();
 
             if (!topic || !contentType) {
                 showError('Por favor completa todos los campos requeridos.');
@@ -694,7 +817,8 @@
                     body: JSON.stringify({
                         topic,
                         context: contentType,
-                        voice_sample: voiceSample || null
+                        voice_sample: voiceSample || null,
+                        author_profile: authorProfile || null
                     })
                 });
 
@@ -705,8 +829,8 @@
 
                 const data = await response.json();
 
-                currentContent = data.content;
-                outputContent.textContent = data.content;
+                currentContent = cleanForLinkedIn(data.content);
+                outputContent.textContent = currentContent;
 
                 if (data.coach_note) {
                     coachNote.textContent = data.coach_note;
@@ -867,7 +991,8 @@
                         statusEl.style.display = 'block';
                     }
                 } else {
-                    statusEl.textContent = 'Publicado en LinkedIn exitosamente!';
+                    window.open(data.postUrl || 'https://www.linkedin.com/feed/', '_blank');
+                    statusEl.innerHTML = '✓ Publicado en LinkedIn. <a href="' + (data.postUrl || 'https://www.linkedin.com/feed/') + '" target="_blank" rel="noopener" style="color:inherit;font-weight:600;">Ver post →</a>';
                     statusEl.className = 'linkedin-post-status success';
                     statusEl.style.display = 'block';
                 }
@@ -890,6 +1015,7 @@
             document.getElementById('linkedinPostStatus').style.display = 'none';
         };
 
+        loadPersisted();
         initLinkedIn();
     </script>
 </body>
